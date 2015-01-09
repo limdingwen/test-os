@@ -1,13 +1,15 @@
 # TestOS
 Test OS
 
+Written fully in hex (yes!), by a hex editor only.
+
 Based on tutorial: http://www.brokenthorn.com/Resources/OSDev3.html
 
 Contents:
-~~bochs -- see below~~
-README.md
-boot1.bin -- the main binary
-boot.img -- the floppy disk image (makefile coming later!)
+	~~bochs -- see below~~
+	README.md
+	boot1.bin -- the main binary
+	boot.img -- the floppy disk image (makefile coming later!)
 
 EDIT: I no longer recommend bochs because it just doesn't work, not only with my OS but even with others. I have switched to VirtualBox and it works just fine and it also looks so cool to have your OS running alongside the giants.
 
@@ -15,11 +17,11 @@ Here's a guide to running boot.img on VirtualBox and on a real PC.
 
 VirtualBox:
 
-	1. Add new system, select other OS.
+	1. Add new system, select other OS. Give 64MB.
 	2. Give no hard disk. Create.
-	3. Go to storage, add Floppy Controller.
+	3. Go to storage in settings, add Floppy Controller.
 	4. Add existing image (boot.img) into floppy controller. Like inserting the floppy.
-	5. Boot the system, press cancel and prompted to insert CD.
+	5. Boot the system, press cancel when prompted to insert CD.
 	6. Profit!
 
 Real PC:
