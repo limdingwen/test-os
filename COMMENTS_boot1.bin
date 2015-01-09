@@ -1,8 +1,31 @@
-00:
-XOR BX = 0
-MOV AH = 0x0E
-MOV AL = 0x41
-INT 0x10
+boot1 (boot sector) will be loaded into memory 7C00 by BIOS
 
-0B to 3D: FAT12 OEM table data
-1FE to 1FF: Bootable magic numbers data
+7C00 to 7C08: Start code
+7C00 MOVDX = 7C3E
+7C03 CALL +19A to 7DA0
+7C06 CLI
+7C07 HLT
+
+7C09 to 7C0A: Jump code
+
+7C0B to 7C3D: FAT12 OEM table data
+
+7C3E to 7C7E: Data
+7C3E "TestOS loaded.", 0
+
+7C7F to 7D9F: Main code
+
+7DA0 to 7DFD: Procedures code
+7DA0 to 7DB5: String print code
+7DA0 XOR CX = 0
+7DA2 XOR BX = 0
+7DA4 MOV AX = memory(DX + CX)
+7DA7 CMP AL _ 0
+7DA9 JE +7 to 7DB2
+7DAB MOVAH = E
+7DAD INT 10
+7DAF INCCX
+7DB0 JMP -E to 7DA4
+7DB2 RET
+
+7DFE to 7DFF: Bootable magic numbers data
