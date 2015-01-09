@@ -1,0 +1,3 @@
+00 to 01: Jump to avoid OEM code
+0B to 3D: FAT12 OEM table data
+1FE to 1FF: Bootable magic numbers data
