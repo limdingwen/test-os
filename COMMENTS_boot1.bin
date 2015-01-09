@@ -1,12 +1,14 @@
 boot1 (boot sector) will be loaded into memory 7C00 by BIOS
 
 7C00 to 7C08: Start code
-7C00 MOVDX = 7C3E
-7C03 CALL +19A to 7DA0
-7C06 CLI
-7C07 HLT
+7C00 XOR EAX = self 0
+7C02 XOR EBX = self 0
+7C04 XOR ECX = self 0
+7C06 XOR EDX = self 0
+7C08 NOP
 
 7C09 to 7C0A: Jump code
+7C09 JMP byte +74 to 7C7F
 
 7C0B to 7C3D: FAT12 OEM table data
 
@@ -14,18 +16,22 @@ boot1 (boot sector) will be loaded into memory 7C00 by BIOS
 7C3E "TestOS loaded.", 0
 
 7C7F to 7D9F: Main code
+7C7F MOVDX = dw 7C3E
+7C84 CALL word +119 to 7DA0
+7C87 CLI
+7C88 HLT
 
 7DA0 to 7DFD: Procedures code
 7DA0 to 7DB5: String print code
-7DA0 XOR CX = 0
-7DA2 XOR BX = 0
+7DA0 XOR CX = self 0
+7DA2 XOR BX = self 0
 7DA4 MOV AX = memory(DX + CX)
-7DA7 CMP AL _ 0
-7DA9 JE +7 to 7DB2
-7DAB MOVAH = E
-7DAD INT 10
+7DA7 CMP AL _ byte 0
+7DA9 JE byte +7 to 7DB2
+7DAB MOVAH = byte E
+7DAD INT byte 10
 7DAF INCCX
-7DB0 JMP -E to 7DA4
+7DB0 JMP byte -E to 7DA4
 7DB2 RET
 
 7DFE to 7DFF: Bootable magic numbers data
