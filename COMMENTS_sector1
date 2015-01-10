@@ -3,26 +3,25 @@ sector1 (boot sector) will be loaded into memory 7C00 by BIOS
 Running in 16-bit x86 Real Mode.
 
 7C00 to 7C08: Main code
-7C00 MOVDX word 7D80
-7C03 CALL word segment 7D5 word offset 0
-7C08..7C1D NOP
-7C1E CLI
-7C1F HLT
+7C00 MOVDX word 7DC0
+7C03 CALL doubleword segment 7D5 offset 0
+7C08 CLI
+7C09 HLT
 
 7D50 to 7DBF: Procedures code
 7D50 to 7D65: String print code (offset 0)
 7D50 XOR byte 11CXCX
 7D52 XOR byte 11BXBX
-7D54 MOV byte 00AX100 byte 00CXBX ([BX + CX*1]) (1 = 2^0)
-7D57 CMPAL byte 0
-7D59 JE byte +7 to 7D62
-7D5B MOVAH byte E
-7D5D INT byte 10
-7D5F INCCX
-7D60 JMP byte -E to 7D54
-7D62 RET
+7D54 67 MOV byte 00AX100 byte 00CXDX ([DX + CX*1]) (1 = 2^0)
+7D58 CMPAL byte 0
+7D5A JE byte +7 to 7D62
+7D5C MOVAH byte E
+7D5E INT byte 10
+7D60 INCCX
+7D61 JMP byte -F to 7D54
+7D63 RET
 
-7D80 to 7DFD: Data
-7D80 "TestOS loaded.", 0
+7DC0 to 7DFD: Data
+7DC0 "TestOS loaded.", 0
 
 7DFE to 7DFF: Bootable magic numbers data
