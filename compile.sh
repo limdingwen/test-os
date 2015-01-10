@@ -7,7 +7,7 @@ echo "OK"
 
 echo
 echo "Copying boot1.bin into sector 1..."
-dd if=boot1.bin of=boot.img bs=512 conv=notrunc
+dd if=sector1.bin of=boot.img bs=512 conv=notrunc
 echo "OK"
 
 echo
