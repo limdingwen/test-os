@@ -14,8 +14,8 @@ Scan and print; typing.
 
 7C10 XOR (reg to rm) byte 11AHAH
 7C12 INT byte 16
-7C14 CMPAL byte 11 (Ctrl-Q ascii)
-7C16 JZ byte +8 to 7C20
+7C14 CALL word +19 to 7C30
+7C17 NOP
 7C18 MOVAH byte E
 7C1A INT byte 10
 7C1C JMP byte -E to 7C10
@@ -26,6 +26,21 @@ Halt the system.
 7C23 CALL doubleword segment 7D5 offset 0
 7C28 CLI
 7C29 HLT
+
+Handle keyboard meta.
+
+7C30 CMPAL byte 11 (Ctrl-Q ascii)
+7C32 JZ byte -14 to 7C20
+7C34 CMPAL byte D (return ascii)
+7C36 JNZ byte +17 to 7C4F
+
+7C38..7C46 NOP (in-case)
+
+7C47 MOVAH byte E
+7C49 MOVAL byte A (linefeed ascii)
+7C4B INT byte 10
+7C4D MOVAL byte D (return ascii)
+7C4F RET
 
 7D50 to 7DBF: Procedures code
 
@@ -39,7 +54,7 @@ Halt the system.
 7D5E INT byte 10
 7D60 INCCX
 7D61 JMP byte -F to 7D54
-7D63 RET
+7D63 RETF
 
 7DC0 to 7DFD: Data
 
