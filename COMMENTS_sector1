@@ -8,7 +8,7 @@ Print welcome message
 7C00 MOVDX word 7DC0
 7C03 CALL doubleword segment 7D5 offset 0
 
-7C08..7C0F NOP
+7C08..7C0F NOP (bridge)
 
 Scan and print; typing.
 
@@ -22,13 +22,10 @@ Scan and print; typing.
 
 Halt the system.
 
-7C20 CLI
-7C21 HLT
-
-To be disposed.
-
-7C30 CLI
-7C31 HLT
+7C20 MOVDX word 7DD1
+7C23 CALL doubleword segment 7D5 offset 0
+7C28 CLI
+7C29 HLT
 
 7D50 to 7DBF: Procedures code
 
@@ -46,6 +43,7 @@ To be disposed.
 
 7DC0 to 7DFD: Data
 
-7DC0 "TestOS loaded.", 0
+7DC0 "TestOS loaded.", a, d, 0
+7DD1 a, d, "System halted.", 0
 
 7DFE to 7DFF: Bootable magic numbers data
