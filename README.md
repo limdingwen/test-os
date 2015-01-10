@@ -1,5 +1,5 @@
 # TestOS
-Test OS
+Test OS is a very barebone operating system that it loaded by the BIOS into 0x7c00 and from there, executes assembly instructions immediately. No EFI, no config, no boot folders, no bullshit. It's like programming for the C64, but for modern computers!
 
 Written fully in hex (yes!), by a hex editor only.
 
