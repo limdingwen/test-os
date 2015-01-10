@@ -14,3 +14,4 @@ echo "OK"
 echo
 echo "Done. 1.44MB floppy boot.img is located in '.'."
 echo "You can boot this image in any PC x86 emulator,"
+echo
