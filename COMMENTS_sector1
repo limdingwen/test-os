@@ -1,37 +1,28 @@
-boot1 (boot sector) will be loaded into memory 7C00 by BIOS
+sector1 (boot sector) will be loaded into memory 7C00 by BIOS
 
-7C00 to 7C08: Start code
-7C00 XOR EAX = self 0
-7C02 XOR EBX = self 0
-7C04 XOR ECX = self 0
-7C06 XOR EDX = self 0
-7C08 NOP
+Running in 16-bit x86 Real Mode.
 
-7C09 to 7C0A: Jump code
-7C09 JMP byte +74 to 7C7F
+7C00 to 7C08: Main code
+7C00 MOVDX word 7D80
+7C03 CALL word segment 7D5 word offset 0
+7C08..7C1D NOP
+7C1E CLI
+7C1F HLT
 
-7C0B to 7C3D: FAT12 OEM table data
+7D50 to 7DBF: Procedures code
+7D50 to 7D65: String print code (offset 0)
+7D50 XOR byte 11CXCX
+7D52 XOR byte 11BXBX
+7D54 MOV byte 00AX100 byte 00CXBX ([BX + CX*1]) (1 = 2^0)
+7D57 CMPAL byte 0
+7D59 JE byte +7 to 7D62
+7D5B MOVAH byte E
+7D5D INT byte 10
+7D5F INCCX
+7D60 JMP byte -E to 7D54
+7D62 RET
 
-7C3E to 7C7E: Data
-7C3E "TestOS loaded.", 0
-
-7C7F to 7D9F: Main code
-7C7F MOVDX = dw 7C3E
-7C84 CALL word +119 to 7DA0
-7C87 CLI
-7C88 HLT
-
-7DA0 to 7DFD: Procedures code
-7DA0 to 7DB5: String print code
-7DA0 XOR CX = self 0
-7DA2 XOR BX = self 0
-7DA4 MOV AX = memory(DX + CX)
-7DA7 CMP AL _ byte 0
-7DA9 JE byte +7 to 7DB2
-7DAB MOVAH = byte E
-7DAD INT byte 10
-7DAF INCCX
-7DB0 JMP byte -E to 7DA4
-7DB2 RET
+7D80 to 7DFD: Data
+7D80 "TestOS loaded.", 0
 
 7DFE to 7DFF: Bootable magic numbers data
