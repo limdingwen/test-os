@@ -1,13 +1,15 @@
 #!/bin/sh
 
 echo
-echo "Deleting boot.img if any to ensure complete overwrite... "
+echo "Deleting boot.img if any to ensure complete overwrite..."
 rm boot.img
 echo "OK"
-echo "Generating 1.44MB boot.img blank floppy... "
+echo
+echo "Generating 1.44MB boot.img blank floppy..."
 dd if=/dev/zero of=boot.img bs=1k count=1440
 echo "OK"
-echo "Copying sector1.bin into sector 1 of boot.img... "
+echo
+echo "Copying sector1.bin into sector 1 of boot.img..."
 dd if=sector1.bin of=boot.img bs=512 conv=notrunc
 echo "OK"
 
