@@ -5,6 +5,11 @@ Written fully in hex (yes!), by a hex editor only.
 
 Based on tutorial: http://www.brokenthorn.com/Resources/OSDev3.html
 
+How to use:
+	1. Boot it with instructions as of below.
+	2. Get a welcome message.
+	3. You can type! 'CTRL-Q' to quit.
+
 Contents:
 	~~bochs -- see below~~
 	README.md
