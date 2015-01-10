@@ -13,4 +13,3 @@ echo "OK"
 echo
 echo "Done. Floppy boot.img is located in '.'."
 echo "You can boot this image in any PC x86 emulator,"
-echo "(I use bochs, check out /bochs for the config files) or real PC x86."
