@@ -1,20 +1,29 @@
 sector1 (boot sector) will be loaded into memory 7C00 by BIOS
 Running in 16-bit x86 Real Mode.
 
-7C00 to 7C08: Main code
+
+0500: RAM Variables (uninitialized on start)
+
+0500 Input buffer pointer offset relative to 0501
+0501..0600 Input buffer
+
+
+7C00 to 7D4F: Main code
 
 Print welcome message
 
-7C00 MOVDX word 7DC0
+7C00 MOVDX word 7DBD
 7C03 CALL doubleword segment 7D5 offset 0
+7C08 CALL doubleword segment 7D5 offset 20
 
-7C08..7C0F NOP (bridge)
+7C0D..7C0F NOP
 
-Scan and print; typing.
+Scan and print; typing. Also calls 7C30 to handle each character.
 
 7C10 XOR (reg to rm) byte 11AHAH
 7C12 INT byte 16
-7C14 CALL word +19 to 7C30
+7C14 JMP byte +1A to 7C30
+7C16 NOP
 7C17 NOP
 7C18 MOVAH byte E
 7C1A INT byte 10
@@ -27,20 +36,33 @@ Halt the system.
 7C28 CLI
 7C29 HLT
 
-Handle keyboard meta.
+Handle keyboard character.
 
 7C30 CMPAL byte 11 (Ctrl-Q ascii)
 7C32 JZ byte -14 to 7C20
 7C34 CMPAL byte D (return ascii)
-7C36 JNZ byte +17 to 7C4F
+7C36 JZ byte +F to 7C47
 
-7C38..7C46 NOP (in-case)
+Handle normal character.
+
+7C38..7C3F NOP
+
+7C40 // NOP for now. TODO: Input buffer.
+7C45 JMP byte -31 to 7C16 (like normal return, print the character)
+
+Handle return.
 
 7C47 MOVAH byte E
 7C49 MOVAL byte A (linefeed ascii)
 7C4B INT byte 10
 7C4D MOVAL byte D (return ascii)
-7C4F RET
+7C4F INT byte 10
+
+7C51..7C58 NOP
+
+7C59 CALL doubleword segment 7D5 offset 20
+7C5E JMP byte -50 to 7C10 (don't print, return to read immediately)
+
 
 7D50 to 7DBF: Procedures code
 
@@ -56,9 +78,20 @@ Handle keyboard meta.
 7D61 JMP byte -F to 7D54
 7D63 RETF
 
-7DC0 to 7DFD: Data
+7D70 to 7D80: Print prompt code (offset 20)
+7D70 MOVDX word 7DE4
+7D73 CALL doubleword segment 7D5 offset 0
+7D78 RETF
 
-7DC0 "TestOS loaded.", a, d, 0
-7DD1 a, d, "System halted.", 0
+
+7DBF to 7DFD: Data
+
+7DBD 7 (bell)
+7DBE "TestOS loaded.", a, d
+7DCE a, d, 0 (Newline)
+7DD1 a, d, a, d, "System halted.", 0
+7DE4 "$ ", 0 (Prompt)
+7DE7 byte FF (Input buffer max length)
+
 
 7DFE to 7DFF: Bootable magic numbers data
