@@ -12,15 +12,14 @@ Fill all blanks with 90 to ensure proper parsing in scan-disassemblers.
 
 7C00 to 7D4F: Main code
 
-Print welcome message
+Startup
 
 7C00 MOVDX word 7DBD
-7C03 CALL word +14A to 7D50
-7C06 NOP
-7C07 NOP
-7C08 CALL word +165 to 7D70
+7C03 CALL word +14A to 7D50 (Message)
+7C06 CALL word +87 to 7C90  (Init)
+7C09 CALL word +165 to 7D70 (Prompt)
 
-7C0B..7C0F NOP
+7C0C..7C0F NOP
 
 Scan and print; typing. Also calls 7C30 to handle each character.
 
@@ -103,6 +102,10 @@ Handle rejecting overflow.
 7C8A ADD byte 11000SP word 4
 7C8E JMP byte -7E to 7C10 (don't print, return to read immediately)
 
+Initialize 
+
+7C90 
+
 
 7D40 to 7D4F: Procedures far-call vector table
 
@@ -138,9 +141,12 @@ Handle rejecting overflow.
 
 7DBD 7, "TestOS loaded.", A
 7DCD D, A, 0 (Newline)
-7DD2 D, A, A, "System halted.", 0
+7DD2 D, A, A, "System halt"
+7DE0 "ed.", 0
 7DE4 "$ ", 0 (Prompt)
 7DE7 byte FE (Input buffer max length, must not be at FF)
+7DE8 "Initializ", 0
+7DF2 "ing...", 0
 
 
 7DFE to 7DFF: Bootable magic numbers data
