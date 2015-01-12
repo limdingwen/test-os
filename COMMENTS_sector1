@@ -1,11 +1,13 @@
 sector1 (boot sector) will be loaded into memory 7C00 by BIOS
 Running in 16-bit x86 Real Mode.
 
+Fill all blanks with 90 to ensure proper parsing in scan-disassemblers.
+
 
 0500: RAM Variables (uninitialized on start)
 
 0500 Input buffer pointer offset relative to 0501
-0501..0600 Input buffer
+0501..05FF Input buffer
 
 
 7C00 to 7D4F: Main code
@@ -13,17 +15,18 @@ Running in 16-bit x86 Real Mode.
 Print welcome message
 
 7C00 MOVDX word 7DBD
-7C03 CALL doubleword segment 7D5 offset 0
-7C08 CALL doubleword segment 7D5 offset 20
+7C03 CALL word +14A to 7D50
+7C06 NOP
+7C07 NOP
+7C08 CALL word +165 to 7D70
 
-7C0D..7C0F NOP
+7C0B..7C0F NOP
 
 Scan and print; typing. Also calls 7C30 to handle each character.
 
 7C10 XOR (reg to rm) byte 11AHAH
 7C12 INT byte 16
-7C14 JMP byte +1A to 7C30
-7C16 NOP
+7C14 CALL word +19 to 7C30
 7C17 NOP
 7C18 MOVAH byte E
 7C1A INT byte 10
@@ -31,8 +34,10 @@ Scan and print; typing. Also calls 7C30 to handle each character.
 
 Halt the system.
 
-7C20 MOVDX word 7DD1
-7C23 CALL doubleword segment 7D5 offset 0
+7C20 MOVDX word 7DD2
+7C23 CALL word +12A to 7D50
+7C26 NOP
+7C27 NOP
 7C28 CLI
 7C29 HLT
 
@@ -47,28 +52,71 @@ Handle normal character.
 
 7C38..7C3F NOP
 
-7C40 // NOP for now. TODO: Input buffer.
-7C45 JMP byte -31 to 7C16 (like normal return, print the character)
+7C40 CALL word +1F to 7C62
+
+7C43..7C44 NOP
+
+7C45 RET
+7C46 NOP
 
 Handle return.
 
-7C47 MOVAH byte E
-7C49 MOVAL byte A (linefeed ascii)
-7C4B INT byte 10
-7C4D MOVAL byte D (return ascii)
-7C4F INT byte 10
+7C47 MOVDX word 7DCD
+7C4A CALL +103 word to 7D50
 
-7C51..7C58 NOP
+7C4D..7C58 NOP
 
-7C59 CALL doubleword segment 7D5 offset 20
-7C5E JMP byte -50 to 7C10 (don't print, return to read immediately)
+7C59 CALL word +114 to 7D70
+7C5C ADD byte 11000SP word 2
+7C60 JMP byte -52 to 7C10 (don't print, return to read immediately)
+
+Handle putting characters into input buffer. Check overflow.
+
+7C62 MOV (r/m to reg) byte 11BLAL
+7C64 MOVALMEM word 7DE7
+7C67 MOV (r/m to reg) byte 11CLAL
+7C69 NOP
+7C6A NOP
+7C6B MOVALMEM word 500
+7C6E NOP
+7C6F NOP
+7C70 CMP (reg first) byte 11ALCL
+7C72 NOP
+7C73 NOP
+7C74 JA byte +E to 7C84
+
+Put into buffer.
+
+7C76 MOV (reg to r/m) byte 10BLAL word +501 ([AL + 501])
+7C7A INCAL
+7C7B MOVALMEMTO word 500
+7C7E NOP
+7C7F NOP
+7C80 MOV (r/m to reg) byte 11ALBL
+7C82 RET
+
+Handle rejecting overflow.
+
+7C84 INCCL
+7C85 MOV (r/m to reg) byte 11ALCL
+7C87 MOVALTO word 500 (offset = max + 1 in case it was more. it is max + 1 because max is writable, max + 1 is not. offset represents the next writing position. by setting to max it means that you can overwrite the last one after overflow, which is unintended. by max + 1, it means that you can not [over]write anything until you go back, which is intended.)
+7C8A ADD byte 11000SP word 4
+7C8E JMP byte -7E to 7C10 (don't print, return to read immediately)
+
+
+7D40 to 7D4F: Procedures far-call vector table
+
+7D40 CALL word +D to 7D50
+7D43 RETF
+7D44 CALL word +29 to 7D70
+7D47 RETF
 
 
 7D50 to 7DBF: Procedures code
 
 7D50 to 7D6F: String print code (offset 0)
-7D50 XOR (reg to rm) byte 11CXCX
-7D52 XOR (reg to rm) byte 11BXBX
+7D50 XOR (reg to r/m) byte 11CXCX
+7D52 XOR (reg to r/m) byte 11BXBX
 7D54 byte addr-override 67 MOV byte 00AX100 byte 00CXDX ([DX + CX*1]) (1 = 2^0)
 7D58 CMPAL byte 0
 7D5A JZ byte +7 to 7D62
@@ -76,22 +124,23 @@ Handle return.
 7D5E INT byte 10
 7D60 INCCX
 7D61 JMP byte -F to 7D54
-7D63 RETF
+7D63 RET
 
-7D70 to 7D80: Print prompt code (offset 20)
+7D70 to 7D7F: Print prompt code (offset 20)
 7D70 MOVDX word 7DE4
-7D73 CALL doubleword segment 7D5 offset 0
-7D78 RETF
+7D73 CALL word -26 to 7D50
+7D76 NOP
+7D77 NOP
+7D78 RET
 
 
 7DBF to 7DFD: Data
 
-7DBD 7 (bell)
-7DBE "TestOS loaded.", a, d
-7DCE a, d, 0 (Newline)
-7DD1 a, d, a, d, "System halted.", 0
+7DBD 7, "TestOS loaded.", A
+7DCD D, A, 0 (Newline)
+7DD2 D, A, A, "System halted.", 0
 7DE4 "$ ", 0 (Prompt)
-7DE7 byte FF (Input buffer max length)
+7DE7 byte FE (Input buffer max length, must not be at FF)
 
 
 7DFE to 7DFF: Bootable magic numbers data
