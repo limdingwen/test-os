@@ -63,8 +63,11 @@ Handle return.
 7C47 MOVDX word 7DCD
 7C4A CALL +103 word to 7D50
 
-7C4D..7C58 NOP
+7C4D..7C51 NOP
 
+7C52 MOV (immediate8) byte 00000110 word 500 byte 0 (Reset input buffer pointer)
+7C57 NOP
+7C58 NOP
 7C59 CALL word +114 to 7D70
 7C5C ADD byte 11000SP word 2
 7C60 JMP byte -52 to 7C10 (don't print, return to read immediately)
@@ -99,7 +102,7 @@ Handle rejecting overflow.
 7C85 NOP
 7C86 MOV (reg to r/m) byte 00CL110 word 500 (offset = max + 1 in case it was more. it is max + 1 because max is writable, max + 1 is not. offset represents the next writing position. by setting to max it means that you can overwrite the last one after overflow, which is unintended. by max + 1, it means that you can not [over]write anything until you go back, which is intended.)
 7C8A ADD byte 11000SP word 4
-7C8E JMP byte -7E to 7C10 (don't print, return to read immediately)
+7C8E JMP byte -80 to 7C10 (don't print, return to read immediately)
 
 Initialize system 
 
