@@ -71,43 +71,55 @@ Handle return.
 
 Handle putting characters into input buffer. Check overflow.
 
-7C62 MOV (r/m to reg) byte 11BLAL
-7C64 MOVALMEM word 7DE7
-7C67 MOV (r/m to reg) byte 11CLAL
+7C62 NOP
+7C63 NOP
+7C64 MOV (r/m to reg) byte 00BL110 word 7DE7
+7C68 NOP
 7C69 NOP
 7C6A NOP
-7C6B MOVALMEM word 500
-7C6E NOP
+7C6B MOV (r/m to reg) byte 00CL110 word 500
 7C6F NOP
-7C70 CMP (reg first) byte 11ALCL
+7C70 CMP (reg first) byte 11CLBL
 7C72 NOP
 7C73 NOP
 7C74 JA byte +E to 7C84
 
-Put into buffer.
-
-7C76 MOV (reg to r/m) byte 10BLAL word +501 ([AL + 501])
-7C7A INCAL
-7C7B MOVALMEMTO word 500
-7C7E NOP
+Put into buffer
+7C76 byte addr-override 67 MOV (reg to r/m) byte 10ALCX word +501 ([CX + 501])
+7C7A INCCL
+7C7B MOV (reg to r/m) byte 00CL110 word 500
 7C7F NOP
-7C80 MOV (r/m to reg) byte 11ALBL
+7C80 NOP
+7C81 NOP
 7C82 RET
+7C83 NOP
 
 Handle rejecting overflow.
 
-7C84 INCCL
-7C85 MOV (r/m to reg) byte 11ALCL
-7C87 MOVALTO word 500 (offset = max + 1 in case it was more. it is max + 1 because max is writable, max + 1 is not. offset represents the next writing position. by setting to max it means that you can overwrite the last one after overflow, which is unintended. by max + 1, it means that you can not [over]write anything until you go back, which is intended.)
+7C84 INCBL
+7C85 NOP
+7C86 MOV (reg to r/m) byte 00BL110 word 500 (offset = max + 1 in case it was more. it is max + 1 because max is writable, max + 1 is not. offset represents the next writing position. by setting to max it means that you can overwrite the last one after overflow, which is unintended. by max + 1, it means that you can not [over]write anything until you go back, which is intended.)
 7C8A ADD byte 11000SP word 4
 7C8E JMP byte -7E to 7C10 (don't print, return to read immediately)
 
-Initialize 
+Initialize system 
 
-7C90 
+7C90 MOVDX word 7DE8
+7C93 CALL word +BA to 7D50
+7C96 MOVDX word 7DF2
+7C99 CALL word +B4 to 7D50
+7C9C MOV (immediate8) byte 00000110 word 500 byte 0 (Reset input buffer pointer)
+
+7CA1..7CB2 NOP
+
+7CB3 MOVDX word 7DE8
+7CB6 CALL word +97 to 7D50
+7CB9 MOVDX word 7DE0
+7CBC CALL word +91 to 7D50
+7CBF RET
 
 
-7D40 to 7D4F: Procedures far-call vector table
+7D40 to 7D4F: Procedures far-call vector table code
 
 7D40 CALL word +D to 7D50
 7D43 RETF
@@ -115,21 +127,29 @@ Initialize
 7D47 RETF
 
 
-7D50 to 7DBF: Procedures code
+7D50 to 7DBC: Procedures code
 
-7D50 to 7D6F: String print code (offset 0)
-7D50 XOR (reg to r/m) byte 11CXCX
-7D52 XOR (reg to r/m) byte 11BXBX
-7D54 byte addr-override 67 MOV byte 00AX100 byte 00CXDX ([DX + CX*1]) (1 = 2^0)
-7D58 CMPAL byte 0
-7D5A JZ byte +7 to 7D62
+7D50 to 7D6F: String print code
+
+In  DX: String address, null-terminated.
+Out SI: Length of string, excluding null-term character.
+
+7D50 XOR (r/m to reg) byte 11SISI
+7D52 MOV (r/m to reg) byte 11BXDX
+7D54 MOV (r/m to reg) byte 00AX000 ([BX + SI])
+7D56 CMPAL byte 0
+7D58 JZ byte +9 to 7D63
+7D5A XOR (r/m to reg) byte 11BXBX 
 7D5C MOVAH byte E
 7D5E INT byte 10
-7D60 INCCX
-7D61 JMP byte -F to 7D54
+7D60 INCSI
+7D61 JMP byte -11 to 7D52
 7D63 RET
 
-7D70 to 7D7F: Print prompt code (offset 20)
+7D70 to 7D7F: Print prompt code
+
+Out DX: Prompt string address.
+
 7D70 MOVDX word 7DE4
 7D73 CALL word -26 to 7D50
 7D76 NOP
@@ -137,7 +157,7 @@ Initialize
 7D78 RET
 
 
-7DBF to 7DFD: Data
+7DBD to 7DFD: Data
 
 7DBD 7, "TestOS loaded.", A
 7DCD D, A, 0 (Newline)
