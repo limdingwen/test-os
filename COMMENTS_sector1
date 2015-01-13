@@ -1,8 +1,6 @@
 sector1 (boot sector) will be loaded into memory 7C00 by BIOS
 Running in 16-bit x86 Real Mode.
 
-Fill all blanks with 90 to ensure proper parsing in scan-disassemblers.
-
 
 0500: RAM Variables (uninitialized on start)
 
@@ -17,7 +15,7 @@ Startup
 7C00 MOVDX word 7DBD
 7C03 CALL word +14A to 7D50 (Message)
 7C06 CALL word +87 to 7C90  (Init)
-7C09 CALL word +165 to 7D70 (Prompt)
+7C09 CALL word +164 to 7D70 (Prompt)
 
 7C0C..7C0F NOP
 
@@ -112,11 +110,13 @@ Initialize system
 7C99 CALL word +B4 to 7D50
 7C9C MOV (immediate8) byte 00000110 word 500 byte 0 (Reset input buffer pointer)
 
-7CA1..7CB2 NOP
+7CA1..7CAC NOP
 
-7CB3 MOVDX word 7DE8
+7CAD MOVDX word 7DE8
+7CB0 CALL word +9D to 7D50
+7CB3 MOVDX word 7DE0
 7CB6 CALL word +97 to 7D50
-7CB9 MOVDX word 7DE0
+7CB9 MOVDX word 7DCD
 7CBC CALL word +91 to 7D50
 7CBF RET
 
@@ -166,9 +166,9 @@ Out DX: Prompt string address.
 7DD2 D, A, A, "System halt"
 7DE0 "ed.", 0
 7DE4 "$ ", 0 (Prompt)
-7DE7 byte FE (Input buffer max length, must not be at FF)
+7DE7 byte FE (Input buffer max pointer offset, must not be FF)
 7DE8 "Initializ", 0
-7DF2 "ing...", 0
+7DF2 "ing...", D, A, 0
 
 
 7DFE to 7DFF: Bootable magic numbers data
