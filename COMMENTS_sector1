@@ -118,7 +118,8 @@ Initialize system
 7CB6 CALL word +97 to 7D50
 7CB9 MOVDX word 7DCD
 7CBC CALL word +91 to 7D50
-7CBF RET
+7CBF CALL word +8E to 7D50
+7CC2 RET
 
 
 7D40 to 7D4F: Procedures far-call vector table code
