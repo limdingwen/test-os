@@ -117,13 +117,9 @@ Initialize system
 
 7CAD MOVDX word 7DE8
 7CB0 CALL word +9D to 7D50
-7CB3 MOVDX word 7DE0
+7CB3 MOVDX word 7DB6
 7CB6 CALL word +97 to 7D50
-7CB9 MOVDX word 7DCD
-7CBC CALL word +91 to 7D50
-7CBF MOVALMEM word 7DCE
-7CC2 CALL word +BB to 7D80
-7CC5 RET
+7CB9 RET
 
 Handle backspace
 
@@ -190,12 +186,12 @@ In  BH: Refer to int-10h options E.
 7D86 RET
 
 
-7DBD to 7DFD: Data
+7DB6 to 7DFD: Data
 
+7DB6 "ed.", D, A, A, 0
 7DBD 7, "TestOS loaded.", A
 7DCD D (carriagereturn@7DCD), A (linefeed@7DCE), 0
-7DD2 D, A, A, "System halt"
-7DE0 "ed.", 0
+7DD2 D, A, A, "System halted.", 0
 7DE4 "$ ", 0 (Prompt)
 7DE7 byte FE (Input buffer max pointer offset, must not be FF)
 7DE8 "Initializ", 0
