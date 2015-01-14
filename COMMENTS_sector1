@@ -136,8 +136,10 @@ character -- don't input into buffer)
 7D43 RETF
 7D44 CALL word +29 to 7D70
 7D47 RETF
-7D48 CALL word to 7D80
+7D48 CALL word +35 to 7D80
 7D4A RETF
+7D4B CALL word +3C to 7D8A
+7D4E RETF
 
 
 7D50 to 7DBC: Procedures code
@@ -184,6 +186,14 @@ In  BH: Refer to int-10h options E.
 7D82 MOVAH byte E
 7D84 INT byte 10
 7D86 RET
+
+7D8A to 7D8F: Read character from keyboard
+
+Out AL: Character ASCII
+
+7D8A XOR byte 11AHAH
+7D8C INT byte 16
+7D8E RET
 
 
 7DB6 to 7DFD: Data
