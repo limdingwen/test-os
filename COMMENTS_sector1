@@ -21,8 +21,8 @@ Startup
 
 Scan and print; typing. Also calls 7C30 to handle each character.
 
-7C10 XOR (reg to rm) byte 11AHAH
-7C12 INT byte 16
+7C10 CALL word +177 to 7D8A
+7C13 NOP
 7C14 CALL word +19 to 7C30
 7C17 NOP
 7C18 CALL word +165 to 7D80
