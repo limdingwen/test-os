@@ -25,8 +25,8 @@ Scan and print; typing. Also calls 7C30 to handle each character.
 7C12 INT byte 16
 7C14 CALL word +19 to 7C30
 7C17 NOP
-7C18 MOVAH byte E
-7C1A INT byte 10
+7C18 CALL word +165 to 7D80
+7C1B NOP
 7C1C JMP byte -E to 7C10
 
 Halt the system.
@@ -118,8 +118,9 @@ Initialize system
 7CB6 CALL word +97 to 7D50
 7CB9 MOVDX word 7DCD
 7CBC CALL word +91 to 7D50
-7CBF CALL word +8E to 7D50
-7CC2 RET
+7CBF MOVALMEM word 7DCE
+7CC2 CALL word +BB to 7D80
+7CC5 RET
 
 
 7D40 to 7D4F: Procedures far-call vector table code
@@ -128,6 +129,8 @@ Initialize system
 7D43 RETF
 7D44 CALL word +29 to 7D70
 7D47 RETF
+7D48 CALL word to 7D80
+7D4A RETF
 
 
 7D50 to 7DBC: Procedures code
@@ -142,9 +145,10 @@ Out SI: Length of string, excluding null-term character.
 7D54 MOV (r/m to reg) byte 00AX000 ([BX + SI])
 7D56 CMPAL byte 0
 7D58 JZ byte +9 to 7D63
-7D5A XOR (r/m to reg) byte 11BXBX 
-7D5C MOVAH byte E
-7D5E INT byte 10
+7D5A CALL word +23 to 7D80
+7D5D NOP
+7D5E NOP
+7D5F NOP
 7D60 INCSI
 7D61 JMP byte -11 to 7D52
 7D63 RET
@@ -159,11 +163,26 @@ Out DX: Prompt string address.
 7D77 NOP
 7D78 RET
 
+7D80 to 7D8F: Print character with default options
+
+In  AL: Character ASCII
+
+7D80 XOR (r/m to reg) byte 11BXBX
+
+7D82 to 7D8F: Print character with options
+
+In  BL: next
+In  BH: Refer to int-10h options E.
+
+7D82 MOVAH byte E
+7D84 INT byte 10
+7D86 RET
+
 
 7DBD to 7DFD: Data
 
 7DBD 7, "TestOS loaded.", A
-7DCD D, A, 0 (Newline)
+7DCD D (carriagereturn@7DCD), A (linefeed@7DCE), 0
 7DD2 D, A, A, "System halt"
 7DE0 "ed.", 0
 7DE4 "$ ", 0 (Prompt)
