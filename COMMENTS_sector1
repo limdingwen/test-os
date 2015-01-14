@@ -44,14 +44,17 @@ Handle keyboard character.
 7C32 JZ byte -14 to 7C20
 7C34 CMPAL byte D (return ascii)
 7C36 JZ byte +F to 7C47
+7C38 CMPAL byte 8 (backspace ascii)
+7C3A JZ byte +26 to 7C62
 
 Handle normal character.
 
-7C38..7C3F NOP
+7C3C..7C3F NOP
 
-7C40 CALL word +1F to 7C62
+7C40 CALL word +25 to 7C68
 
-7C43..7C44 NOP
+7C43 NOP
+7C44 NOP
 
 7C45 RET
 7C46 NOP
@@ -70,29 +73,29 @@ Handle return.
 7C5C ADD byte 11000SP word 2
 7C60 JMP byte -52 to 7C10 (don't print, return to read immediately)
 
+Bounce Hub: Handle Characters -- Handle Backspace
+
+7C62 JMP byte +62 to 7CC6 ( --> Jump over into function)
+7C64 JMP byte -21 to 7C45 ( <-- Print but don't handle)
+7C66 NOP
+7C67 NOP
+
 Handle putting characters into input buffer. Check overflow.
 
-7C62 NOP
-7C63 NOP
-7C64 MOV (r/m to reg) byte 00CL110 word 7DE7
-7C68 NOP
-7C69 XOR (r/m to reg) byte 11BXBX
-7C6B MOV (r/m to reg) byte 00BL110 word 500
-7C6F NOP
-7C70 CMP (reg first) byte 11BLCL
-7C72 NOP
-7C73 NOP
+7C68 MOV (r/m to reg) byte 00CL110 word 7DE7
+7C6C XOR (r/m to reg) byte 11BXBX
+7C6E MOV (r/m to reg) byte 00BL110 word 500
+7C72 CMP (reg first) byte 11BLCL
 7C74 JA byte +E to 7C84
 
 Put into buffer
+
 7C76 MOV (reg to r/m) byte 10AL111 word +501 ([BX + 501])
 7C7A INCBL
 7C7B MOV (reg to r/m) byte 00BL110 word 500
 7C7F NOP
 7C80 NOP
-7C81 NOP
-7C82 RET
-7C83 NOP
+7C81 RET
 
 Handle rejecting overflow.
 
@@ -121,6 +124,14 @@ Initialize system
 7CBF MOVALMEM word 7DCE
 7CC2 CALL word +BB to 7D80
 7CC5 RET
+
+Handle backspace
+
+7CC6 CMP (immediate8) byte 00000110 word 500 byte 0
+7CCB JZ byte -6D to 7C60 (don't print, return to read immediately)
+7CCD DEC byte 00000110 word 500
+7CD1 JMP byte -6F to 7C64 (print but don't handle as normal
+character -- don't input into buffer)
 
 
 7D40 to 7D4F: Procedures far-call vector table code
