@@ -191,7 +191,7 @@ In  BH: Refer to int-10h options E.
 
 Out AL: Character ASCII
 
-7D8A XOR byte 11AHAH
+7D8A XOR (r/m to reg) byte 11AHAH
 7D8C INT byte 16
 7D8E RET
 
