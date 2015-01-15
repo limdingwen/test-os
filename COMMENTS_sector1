@@ -146,21 +146,26 @@ character -- don't input into buffer)
 
 7D50 to 7D6F: String print code
 
-In  DX: String address, null-terminated.
-Out SI: Length of string, excluding null-term character.
+In  DX: String address, null-terminated. FF to jump fragmentation.
+Out SI: Length of last (fragmented) string, excluding null-term character.
 
 7D50 XOR (r/m to reg) byte 11SISI
 7D52 MOV (r/m to reg) byte 11BXDX
-7D54 MOV (r/m to reg) byte 00AX000 ([BX + SI])
+7D54 MOV (r/m to reg) byte 00AL000 ([BX + SI])
 7D56 CMPAL byte 0
-7D58 JZ byte +9 to 7D63
-7D5A CALL word +23 to 7D80
-7D5D NOP
-7D5E NOP
-7D5F NOP
-7D60 INCSI
-7D61 JMP byte -11 to 7D52
-7D63 RET
+7D58 JZ byte +A to 7D64
+7D5A CMPAL byte FF (Follow fragmentation)
+7D5C JZ byte +7 to 7D65
+7D5E CALL word +1F to 7D80
+7D61 INCSI
+7D62 JMP byte -12 to 7D52
+7D64 RET
+7D65 INCSI
+7D66 XOR byte 11AXAX
+7D68 MOV (r/m to reg) byte 00AL000 ([BX + SI])
+7D6A CMPAL byte 80 (Check negative)
+7D6C JAE byte +26 to 7D94
+7D6E JMP byte +20 to 7D90
 
 7D70 to 7D7F: Print prompt code
 
@@ -172,6 +177,8 @@ Out DX: Prompt string address.
 7D77 NOP
 7D78 RET
 
+7D7F NOP
+
 7D80 to 7D8F: Print character with default options
 
 In  AL: Character ASCII
@@ -180,7 +187,7 @@ In  AL: Character ASCII
 
 7D82 to 7D8F: Print character with options
 
-In  BL: next
+In  BL: Same as BH
 In  BH: Refer to int-10h options E.
 
 7D82 MOVAH byte E
@@ -194,6 +201,17 @@ Out AL: Character ASCII
 7D8A XOR (r/m to reg) byte 11AHAH
 7D8C INT byte 16
 7D8E RET
+
+7D90 to 7D9F: String printing continued
+
+7D90 ADD (r/m to reg) byte 11DXAX
+7D92 JMP byte +9 to 7D9D
+7D94 XOR (r/m to reg) byte 11BXBX (Signed add)
+7D96 MOVBL byte FF
+7D98 SUB (r/m to reg) byte 11BLAL
+7D9A INCBL
+7D9B SUB (r/m to reg) byte 11DXBX
+7D9D JMP byte -4F to 7D50
 
 
 7DB6 to 7DFD: Data
