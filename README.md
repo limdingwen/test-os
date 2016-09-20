@@ -1,7 +1,7 @@
 # TestOS
-Test OS is a very barebone operating system that it loaded by the BIOS into 0x7c00 and from there, executes assembly instructions immediately. No EFI, no config, no boot folders, no bullshit. It's like programming for the C64, but for modern computers!
+Test OS is a very barebone operating system that it loaded by the BIOS into 0x7c00 and from there, executes assembly instructions immediately. No EFI, no config, no boot folders. It's like programming for the C64, but for modern computers!
 
-Written fully in hex (yes!), by a hex editor only.
+Written fully in hex, by a hex editor only.
 
 Based on tutorial: http://www.brokenthorn.com/Resources/OSDev3.html
 
